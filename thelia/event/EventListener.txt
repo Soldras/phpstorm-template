@@ -1,0 +1,20 @@
+<?php
+#parse("PHP File Header.php")
+
+namespace ${MODULE}\EventListeners;
+
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+#parse("PHP Class Doc Comment.php")
+class ${NAME} implements EventSubscriberInterface
+{
+     /**
+     * @inheritDoc
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+
+        ];
+    }
+}

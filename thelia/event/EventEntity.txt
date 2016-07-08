@@ -1,0 +1,11 @@
+<?php
+#parse("PHP File Header.php")
+
+namespace ${MODULE}\Event;
+
+use ${MODULE}\Event\Base\AbstractEntityEvent;
+
+#parse("PHP Class Doc Comment.php")
+class ${NAME} extends AbstractEntityEvent {
+
+}

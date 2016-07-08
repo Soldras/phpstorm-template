@@ -1,0 +1,208 @@
+<?php
+#parse("PHP File Header.php")
+
+namespace ${MODULE}\Service\Base;
+
+use ${MODULE}\Event\Base\AbstractEntityEvent as Event;
+use Propel\Runtime\Map\TableMap;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Event\DefaultActionEvent;
+
+#parse("PHP Class Doc Comment.php")
+abstract class AbstractBaseService
+{
+
+    const EVENT_CREATE_BEFORE = null;
+    const EVENT_CREATE_AFTER = null;
+    const EVENT_UPDATE_BEFORE = null;
+    const EVENT_UPDATE_AFTER = null;
+    const EVENT_DELETE_BEFORE = null;
+    const EVENT_DELETE_AFTER = null;
+
+    protected \$dispatcher;
+
+    //CREATION
+
+    /**
+     * Allow to proccess Creation Even Sender
+     * @param Event \$event
+     */
+    protected function create(Event \$event)
+    {
+        \$this->dispatch(static::EVENT_CREATE_BEFORE, \$event);
+        if (!\$event->isPropagationStopped()) {
+            \$this->createProcess(\$event);
+            if (!\$event->isPropagationStopped()) {
+                \$this->dispatch(static::EVENT_CREATE_AFTER, \$event);
+            }
+        }
+    }
+
+    /**
+     * Allow to create an object from an Event
+     * @param Event \$event
+     */
+    protected function createProcess(Event \$event)
+    {
+        \$event->getEntity()->save();
+    }
+
+    // UPDATE
+
+    /**
+     * Allow to send Update Events
+     * @param Event \$event
+     */
+    protected function update(Event \$event)
+    {
+        \$this->dispatch(static::EVENT_UPDATE_BEFORE, \$event);
+        if (!\$event->isPropagationStopped()) {
+            \$this->updateProcess(\$event);
+            if (!\$event->isPropagationStopped()) {
+                \$this->dispatch(static::EVENT_UPDATE_AFTER, \$event);
+            }
+        }
+    }
+
+
+    /**
+     * Allow to update an object from an event
+     * @param Event \$event
+     */
+    protected function updateProcess(Event \$event)
+    {
+        \$event->getEntity()->save();
+    }
+
+    // DELETE
+
+    protected function delete(Event \$event)
+    {
+        \$this->dispatch(static::EVENT_DELETE_BEFORE, \$event);
+        if (!\$event->isPropagationStopped()) {
+            \$this->deleteProcess(\$event);
+            if (!\$event->isPropagationStopped()) {
+                \$this->dispatch(static::EVENT_DELETE_AFTER, \$event);
+            }
+        }
+    }
+
+    protected function deleteProcess(Event \$event)
+    {
+        \$event->getEntity()->delete();
+    }
+
+    public function createFromArray(\$data, \$locale = null)
+    {
+        \$entity = \$this->hydrateObjectArray(\$data, \$locale);
+
+        \$event = \$this->getNewEvent();
+        \$event->setEntity(\$entity);
+
+        \$this->create($\event);
+
+        return \$event->getEntity();
+    }
+
+    public function updateFromArray(\$data, \$locale = null)
+    {
+        \$entity = \$this->hydrateObjectArray(\$data,\$locale);
+
+        \$event = \$this->getNewEvent();
+        \$event->setEntity(\$entity);
+
+        \$this->update(\$event);
+
+        return \$event->getEntity();
+    }
+
+    public function deleteFromId(\$id)
+    {
+        \$entity = \$this->getInstanceEntityQuery()->findOneById(\$id);
+        if (\$entity) {
+            \$event = \$this->getNewEvent();
+            \$event->setEntity(\$entity);
+
+            \$this->delete(\$event);
+        }
+    }
+
+
+    // DEPENDENCIES
+
+    /**
+     * Dispatch a Thelia event
+     *
+     * @param string \$eventName a TheliaEvent name, as defined in TheliaEvents class
+     * @param ActionEvent \$event the action event, or null (a DefaultActionEvent will be dispatched)
+     */
+    protected function dispatch(\$eventName, Event \$event = null)
+    {
+        if (\$event == null) {
+            \$event = new DefaultActionEvent();
+        }
+
+        \$this->getDispatcher()->dispatch(\$eventName, \$event);
+    }
+
+    /**
+     * Return the event dispatcher,
+     *
+     * @return \Symfony\Component\EventDispatcher\EventDispatcher
+     */
+    public function getDispatcher()
+    {
+        return \$this->dispatcher;
+    }
+
+    public function setDispatcher(EventDispatcher \$dispatcher)
+    {
+        \$this->dispatcher = \$dispatcher;
+    }
+
+    protected function hydrateObjectArray(\$data, \$locale)
+    {
+        \$model = \$this->getModelInstance(\$data);
+
+        if(\$locale){
+            \$model->setLocale(\$locale);
+        }
+
+        \$model = \$this->setCustomData(\$model, \$data);
+
+        \$model->fromArray(\$data, TableMap::TYPE_FIELDNAME);
+
+        \$this->processAfterSetup(\$model, \$data);
+
+        return \$model;
+    }
+
+    protected function getModelInstance(\$data)
+    {
+        \$model = \$this->getNewModelInstance();
+
+        if (isset(\$data["id"])) {
+            \$temp = \$this->getInstanceEntityQuery()->findOneById(\$data["id"]);
+
+            if (\$temp) {
+                \$model = \$temp;
+            }
+        }
+
+        return \$model;
+    }
+
+    /**
+     * @return Event
+     */
+    abstract protected function getNewEvent();
+
+    abstract protected function getInstanceEntityQuery();
+
+    abstract protected function getNewModelInstance();
+
+    abstract protected function setCustomData(\$model, \$data);
+
+    abstract protected function processAfterSetup(\$model, \$data);
+}

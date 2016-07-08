@@ -1,0 +1,88 @@
+<?php
+#parse("PHP File Header.php")
+
+namespace ${MODULE}\Loop;
+
+
+use ${MODULE}\Model\\${MODEL_CLASS};
+use ${MODULE}\Model\\${MODEL_CLASS}Query;
+use Propel\Runtime\ActiveQuery\Criteria;
+#if (${I18N} == "true")
+use Thelia\Core\Template\Element\BaseI18nLoop;
+#else
+use Thelia\Core\Template\Element\BaseLoop;
+#end
+use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
+use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+
+#parse("PHP Class Doc Comment.php")
+class ${NAME} extends #if (${I18N} == "true") BaseI18nLoop #else BaseLoop #end implements PropelSearchLoopInterface
+{
+
+    /**
+     * @inheritDoc
+     */
+    public function parseResults(LoopResult \$loopResult)
+    {
+        /**
+         * @var ${MODEL_CLASS} \$model
+         */
+        foreach(\$loopResult->getResultDataCollection() as \$model){
+            \$row = new LoopResultRow();
+
+            \$row->set("ID",\$model->getId());
+
+            \$loopResult->addRow(\$row);
+        }
+
+        return \$loopResult;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getArgDefinitions()
+    {
+        return new ArgumentCollection(
+          Argument::createIntListTypeArgument('id'),
+          Argument::createEnumListTypeArgument('order',[
+              'id',
+              'id-reverse',
+          ],'id')
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function buildModelCriteria()
+    {
+        \$query = ${MODEL_CLASS}Query::create();
+
+        #if (${I18N} == "true")
+        \$this->configureI18nProcessing(\$query,[]);
+        #end
+
+        if(null != \$id = \$this->getId()){
+            \$query->filterById(\$id);
+        }
+
+        foreach (\$this->getOrder() as \$order) {
+            switch (\$order) {
+                case 'id' :
+                    \$query->orderById();
+                    break;
+                case 'id-reverse' :
+                    \$query->orderById(Criteria::DESC);
+                    break;
+                default :
+                    break;
+            }
+        }
+
+        return \$query;
+    }
+}

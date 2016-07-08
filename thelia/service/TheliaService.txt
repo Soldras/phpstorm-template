@@ -1,0 +1,61 @@
+<?php
+#parse("PHP File Header.php")
+
+namespace ${MODULE}\Service;
+
+use ${MODULE}\Event\Base\\${MODULE}Events;
+use ${MODULE}\Event\\${EVENT_CLASS};
+use ${MODULE}\Model\\${MODEL_CLASS};
+use ${MODULE}\Model\\${MODEL_CLASS}Query;
+use ${MODULE}\Service\Base\AbstractBaseService;
+
+#parse("PHP Class Doc Comment.php")
+class ${NAME} extends AbstractBaseService
+{
+
+    const EVENT_CREATE_BEFORE = ${MODULE}Events::${ENTITY_CONST}_CREATE_BEFORE;
+    const EVENT_CREATE_AFTER = ${MODULE}Events::${ENTITY_CONST}_CREATE_AFTER;
+    const EVENT_UPDATE_BEFORE = ${MODULE}Events::${ENTITY_CONST}_UPDATE_BEFORE;
+    const EVENT_UPDATE_AFTER = ${MODULE}Events::${ENTITY_CONST}_UPDATE_AFTER;
+    const EVENT_DELETE_BEFORE = ${MODULE}Events::${ENTITY_CONST}_DELETE_BEFORE;
+    const EVENT_DELETE_AFTER = ${MODULE}Events::${ENTITY_CONST}_DELETE_AFTER;
+
+    /**
+     * @inheritDoc
+     */
+    protected function getNewEvent()
+{
+    return new ${EVENT_CLASS}();
+}
+
+    protected function getInstanceEntityQuery()
+{
+    return ${MODEL_CLASS}Query::create();
+    }
+
+    protected function getNewModelInstance()
+{
+    return new ${MODEL_CLASS}();
+}
+
+    /**
+     * @param ${MODEL_CLASS} \$model
+     * @param \$data
+     * @return ${MODEL_CLASS} \$model
+     */
+    protected function setCustomData(\$model, \$data)
+    {
+        return \$model;
+    }
+
+
+    /**
+     * @param ${MODEL_CLASS} \$model
+     * @param \$data
+     * @return ${MODEL_CLASS} \$model
+     */
+    protected function processAfterSetup(\$model, \$data)
+    {
+        return \$model;
+    }
+}

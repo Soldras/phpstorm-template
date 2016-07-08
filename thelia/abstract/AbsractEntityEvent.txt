@@ -1,0 +1,23 @@
+<?php
+#parse("PHP File Header.php")
+
+namespace ${MODULE}\Event\Base;
+
+use Symfony\Component\EventDispatcher\Event;
+
+#parse("PHP Class Doc Comment.php")
+abstract class AbstractEntityEvent extends Event
+{
+    protected \$entity;
+
+    public function setEntity(\$entity)
+    {
+        \$this->entity = \$entity;
+    }
+
+    public function getEntity()
+    {
+        return \$this->entity;
+    }
+
+}

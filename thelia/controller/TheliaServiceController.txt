@@ -1,0 +1,70 @@
+<?php
+#parse("PHP File Header.php")
+
+namespace ${MODULE}\Controller;
+
+use ${MODULE}\Controller\Base\BaseController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Thelia\Tools\URL;
+
+#parse("PHP Class Doc Comment.php")
+class ${NAME} extends BaseController{
+    const CONTROLLER_ENTITY_NAME = "$ENTITY";
+
+    /**
+     * @inheritDoc
+     */
+    protected function getListRenderTemplate()
+    {
+        return \$this->render("$LIST_TEMPLATE");
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function redirectToListTemplate()
+    {
+        return new RedirectResponse(URL::getInstance()->absoluteUrl("$LIST_URL"));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getEditRenderTemplate()
+    {
+        return \$this->render("$EDIT_TEMPLATE");
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getCreateRenderTemplate()
+    {
+
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getObjectId(\$object)
+    {
+
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getExistingObject()
+    {
+
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function hydrateObjectForm(\$object)
+    {
+
+    }
+
+}
